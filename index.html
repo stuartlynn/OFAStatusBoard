@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      html{
+        font-family: helvetica
+      }
+      html,body{
+        margin:0px;
+        padding:30px;
+      }
+      h1{
+          text-align: left;
+      }
+
+      h2{
+          text-align: left;
+          font-size: 50px;
+          font-weight: 200;
+          line-height:50px;
+          margin:0;
+      }
+
+      h3{
+          text-align: left;
+          font-size: 12px;
+          text-transform: uppercase;
+          padding-bottom: 5px;
+          padding-top: 20px;
+          border-bottom: 1px solid #000;
+      }
+
+      h4{
+          text-align: left;
+          font-size: 20px;
+          margin: 25px 0px 10px 0px;
+      }
+
+
+      #BroadStats{
+        display:flex;
+        flex-direction: row;
+        justify-content: space-around;
+      }
+      #BroadStats div{
+        text-align: center;
+      }
+      #topevent{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      #topevent div,img{
+        padding: 20px
+      }
+
+      #topevent img{
+        width:400px
+      }
+
+      #district p{
+        text-align: center
+      }
+
+      #topevent img{
+        align-self: center
+      }
+
+      #buzz{
+        margin-left:   auto;
+        margin-right:  auto;
+      }
+
+      #buzz iframe{
+        width: 100%;
+      }
+
+      #map{
+        background-color: rgb(98, 98, 98);
+        color:#EDEDED;
+      }
+
+    </style>
+    <script src='https://momentjs.com/downloads/moment.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/af.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.7/vega.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.1/vega-lite.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-rc7/vega-embed.js"></script>
+
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.js"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.css" rel="stylesheet" type="text/css">
+
+  </head>
+  <body>
+    <h1>OFA Weekly Event Report</h1>
+    <div id='map'>
+      <iframe width="100%" height="520" frameborder="0" src="https://team.carto.com/u/stuartlynn/builder/5b88ed80-6dc9-42bc-acf5-e9580686eb75/embed" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+    </div>
+    <div id='BroadStats'>
+
+      <div >
+          <h3>Events</h3>
+          <h4>This week</h4>
+          <h2 id='TotalEventsWeek'></h2>
+          <h4>Year to Date</h4>
+          <h2 id='TotalEventsYear'></h2>
+      </div>
+      <div>
+        <h3>Cities</h3>
+        <h4>This week</h4>
+        <h2 id='TotalCitiesWeek'></h2>
+        <h4>Year to Date</h4>
+        <h2 id='TotalCitiesYear'></h2>
+      </div>
+      <div id='PeopleReached'>
+        <h3>People</h3>
+        <h4>This week</h4>
+        <h2 id='PeopleReachedWeek'></h2>
+        <h4>Year to Date</h4>
+        <h2 id='PeopleReachedYear'></h2>
+      </div>
+
+    </div>
+
+    <div id='HilightEvent'>
+      <h1>Spotlight Event</h1>
+
+      <div id='topevent'>
+          <div>
+            <img width=200 src='SampleImage.jpg'>
+            <p id='TopEventDescription'></p>
+          </div>
+
+          <div id='Atendees'>
+            <h3>Atendees</h3>
+            <h2 id='TopEventAttendees'></h2>
+            <h3>City</h3>
+            <h2 id='TopEventCity'></h2>
+            <h3>Issue</h3>
+            <h2 id='TopEventType'></h2>
+          </div>
+      </div>
+    </div>
+
+    <div id='district'>
+      <h1>Stats Breakdown</h1>
+      <div class='row'>
+        <h3>No of Events by Type</h3>
+        <div id='chart1'></div>
+
+        <h3>No of Rubber Stamp Events by Type</h3>
+        <div id='chart3'></div>
+
+        <h3>No of Events by State</h3>
+        <div id='chart2'></div>
+      </div>
+
+
+    </div>
+
+
+
+    <div id='buzz'>
+      <h1>Buzz</h1>
+      <div style='margin:0px auto '>
+        <a class="twitter-timeline"  href="https://twitter.com/hashtag/OFAction" data-widget-id="928714724195405824"  >#OFAction Tweets</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+      </div>
+    </div>
+
+    <script>
+      window.onload=function(){
+        var sql = new cartodb.SQL({user:'stuartlynn'})
+        sql.execute("select * from ofareport").done(function(data){
+          rows = data.rows
+
+
+          week = rows.filter(function(a){ return (moment().startOf('isoWeek') < moment(a.start_time)) && (moment().endOf('isoWeek') > moment(a.start_time)) })
+          var cities = new Set(rows.map(function(a){ return a.city }))
+          cities = cities.size
+          var top_event = rows.sort(function(a,b){ return ( (a.total_attendees > b.total_attendees) ? -1 : ((a.total_attendees < b.total_attendees) ? 1 : 0))})[0];
+          var total_events = rows.length
+
+          var total_attendees = rows.reduce(function(a,b){ return a+b.total_attendees},0)
+
+          type_breakdown = rows.reduce(function(a,b){  a[b.issue_campaign_broad_issue] ? a[b.issue_campaign_broad_issue] = a[b.issue_campaign_broad_issue] + 1 : a[b.issue_campaign_broad_issue]=1; return a  },{})
+          tb = Object.keys(type_breakdown).map(function(k){ return [k,type_breakdown[k]] })
+
+          type_breakdownrs = rows.filter(function(a){ return a.rubber_stamp!=0}).reduce(function(a,b){  a[b.issue_campaign_broad_issue] ? a[b.issue_campaign_broad_issue] = a[b.issue_campaign_broad_issue] + 1 : a[b.issue_campaign_broad_issue]=1; return a  },{})
+          tbrs = Object.keys(type_breakdownrs).map(function(k){ return [k,type_breakdownrs[k]] })
+
+
+
+          state_breakdown = rows.reduce(function(a,b){  a[b.state] ? a[b.state] = a[b.state] + 1 : a[b.state]=1; return a  },{})
+          sb = Object.keys(state_breakdown).map(function(k){ return [k,state_breakdown[k]] })
+
+          console.log('total atendees ',total_attendees )
+          //var total_attendees_week = week.map(function(a){return a.total_attendees})
+
+          console.log('top event ', top_event)
+
+          document.getElementById('TopEventDescription').innerHTML= top_event.description
+          document.getElementById('TopEventAttendees').innerHTML= top_event.total_attendees
+          document.getElementById('TopEventType').innerHTML= top_event.issue_campaign_broad_issue
+          document.getElementById('TopEventCity').innerHTML= top_event.city
+
+          //populate stats
+          document.getElementById('TotalCitiesWeek').innerHTML = 2
+          document.getElementById('TotalCitiesYear').innerHTML = cities
+
+          document.getElementById('PeopleReachedWeek').innerHTML = 4
+          document.getElementById('PeopleReachedYear').innerHTML = total_attendees
+
+          document.getElementById('TotalEventsWeek').innerHTML = 6
+          document.getElementById('TotalEventsYear').innerHTML = rows.length
+
+
+          //Charts
+
+          var typeChart = c3.generate({
+              bindto: "#chart1",
+              data: {
+        // iris data from R
+              columns: tb,
+              type : 'pie',
+              title: 'Event Type'
+            }
+          });
+
+
+          var stateChart = c3.generate({
+              bindto: "#chart2",
+              data: {
+        // iris data from R
+              columns: sb,
+              type : 'pie',
+              title: 'State'
+            }
+          });
+
+          var typeRSChart = c3.generate({
+              bindto: "#chart3",
+              data: {
+        // iris data from R
+              columns: tbrs,
+              type : 'pie',
+              title: 'State'
+            }
+          });
+
+
+
+        })
+      }
+    </script>
+  </body>
+</html>
